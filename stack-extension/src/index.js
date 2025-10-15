@@ -9,6 +9,12 @@ const Transpiler = require('./transpiler/transpiler')
 const ModuleSystem = require('./modules/moduleSystem')
 const MathOperators = require('./math/operators')
 const WebComponents = require('./web/components')
+const BilingualSystem = require('./language/bilingual')
+const MiniServer = require('./server/miniServer')
+const AdvancedWebFeatures = require('./web/advanced')
+const SmartTemplates = require('./templates/smartTemplates')
+const PluginSystem = require('./plugins/pluginSystem')
+const AIFeatures = require('./ai/aiFeatures')
 const fs = require('fs')
 const path = require('path')
 
@@ -20,6 +26,12 @@ class StackExtension {
     this.moduleSystem = new ModuleSystem()
     this.mathOperators = new MathOperators()
     this.webComponents = new WebComponents()
+    this.bilingualSystem = new BilingualSystem()
+    this.miniServer = null
+    this.advancedWeb = new AdvancedWebFeatures()
+    this.smartTemplates = new SmartTemplates()
+    this.pluginSystem = new PluginSystem()
+    this.aiFeatures = new AIFeatures()
     
     this.version = '1.0.0'
     this.runtime = {
@@ -114,20 +126,20 @@ class StackExtension {
   async dev(filePath, options = {}) {
     console.log(`Modo desenvolvimento iniciado para: ${filePath}`)
     
+    // Iniciar mini servidor
+    this.miniServer = new MiniServer({
+      port: options.port || 3000,
+      host: options.host || 'localhost',
+      rootDir: path.dirname(filePath),
+      autoReload: true,
+      websocket: true,
+      api: true
+    })
+    
+    await this.miniServer.start()
+    
     // Compilar inicial
     await this.compile(filePath, options)
-    
-    // Configurar watcher
-    const chokidar = require('chokidar')
-    const watcher = chokidar.watch(filePath, {
-      persistent: true,
-      ignoreInitial: true
-    })
-    
-    watcher.on('change', async () => {
-      console.log('Arquivo alterado, recompilando...')
-      await this.compile(filePath, options)
-    })
     
     console.log('Modo desenvolvimento ativo. Pressione Ctrl+C para sair.')
   }
@@ -204,12 +216,96 @@ class StackExtension {
     return this.mathOperators.validateExpression(expression)
   }
 
+  // Funcionalidades bilíngues
+  translateCode(code, targetLanguage = 'portuguese') {
+    return this.bilingualSystem.normalizeCode(code, targetLanguage)
+  }
+
+  getLanguageStats(code) {
+    return this.bilingualSystem.getLanguageStats(code)
+  }
+
+  suggestTranslations(code, targetLanguage = 'portuguese') {
+    return this.bilingualSystem.suggestTranslations(code, targetLanguage)
+  }
+
+  // Funcionalidades de IA
+  async completeCode(code, context = {}) {
+    return await this.aiFeatures.completeCode(code, context)
+  }
+
+  async analyzeCode(code, analysisType = 'all') {
+    return await this.aiFeatures.analyzeCode(code, analysisType)
+  }
+
+  async optimizeCode(code, optimizationType = 'performance') {
+    return await this.aiFeatures.optimizeCode(code, optimizationType)
+  }
+
+  async generateCode(description, type = 'function') {
+    return await this.aiFeatures.generateCode(description, type)
+  }
+
+  async debugCode(code, error = null) {
+    return await this.aiFeatures.debugCode(code, error)
+  }
+
+  // Funcionalidades de templates
+  registerTemplate(name, template, options = {}) {
+    return this.smartTemplates.registerTemplate(name, template, options)
+  }
+
+  renderTemplate(name, data = {}, options = {}) {
+    return this.smartTemplates.renderTemplate(name, data, options)
+  }
+
+  // Funcionalidades de plugins
+  registerPlugin(name, plugin, options = {}) {
+    return this.pluginSystem.registerPlugin(name, plugin, options)
+  }
+
+  async loadPlugin(name, options = {}) {
+    return await this.pluginSystem.loadPlugin(name, options)
+  }
+
+  async unloadPlugin(name) {
+    return await this.pluginSystem.unloadPlugin(name)
+  }
+
+  // Funcionalidades web avançadas
+  createHybridComponent(name, definition) {
+    return this.advancedWeb.createHybridComponent(name, definition)
+  }
+
+  createSmartRoute(path, component, options = {}) {
+    return this.advancedWeb.createSmartRoute(path, component, options)
+  }
+
+  createAdvancedWebSocket(url, options = {}) {
+    return this.advancedWeb.createAdvancedWebSocket(url, options)
+  }
+
+  createSmartCache(options = {}) {
+    return this.advancedWeb.createSmartCache(options)
+  }
+
+  // Parar servidor
+  async stop() {
+    if (this.miniServer) {
+      await this.miniServer.stop()
+    }
+  }
+
   // Obter estatísticas
   getStats() {
     return {
       version: this.version,
       modules: this.moduleSystem.getStats(),
       operators: this.listMathOperators().size,
+      bilingual: this.bilingualSystem.getLanguageStats(''),
+      ai: this.aiFeatures.getStats(),
+      templates: this.smartTemplates.getStats(),
+      plugins: this.pluginSystem.getStats(),
       runtime: {
         variables: this.runtime.variables.size,
         functions: this.runtime.functions.size,

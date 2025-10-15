@@ -1,0 +1,353 @@
+// Exemplo de aplicação web completa em Stack Extensão
+// Demonstra componentes, roteamento, WebSocket e store
+
+// Store global para gerenciar estado
+variavel store = {
+    usuario: nulo,
+    mensagens: [],
+    contador: 0,
+    conectado: falso
+}
+
+// Componente de cabeçalho
+componente Cabecalho {
+    funcao render() {
+        retornar `
+            <header class="cabecalho">
+                <h1>Stack Extensão Web App</h1>
+                <nav>
+                    <a href="#/" onclick="navegar('/')">Home</a>
+                    <a href="#/sobre" onclick="navegar('/sobre')">Sobre</a>
+                    <a href="#/contato" onclick="navegar('/contato')">Contato</a>
+                </nav>
+            </header>
+        `
+    }
+}
+
+// Componente de contador
+componente Contador {
+    variavel valor = 0
+    
+    funcao render() {
+        retornar `
+            <div class="contador">
+                <h3>Contador: ${this.valor}</h3>
+                <button onclick="this.incrementar()">Incrementar</button>
+                <button onclick="this.decrementar()">Decrementar</button>
+                <button onclick="this.resetar()">Resetar</button>
+            </div>
+        `
+    }
+    
+    funcao incrementar() {
+        this.valor = this.valor mais 1
+        store.contador = this.valor
+        this.atualizar()
+    }
+    
+    funcao decrementar() {
+        this.valor = this.valor menos 1
+        store.contador = this.valor
+        this.atualizar()
+    }
+    
+    funcao resetar() {
+        this.valor = 0
+        store.contador = 0
+        this.atualizar()
+    }
+    
+    funcao atualizar() {
+        // Atualizar interface
+        imprimir("Contador atualizado: " + this.valor)
+    }
+}
+
+// Componente de chat
+componente Chat {
+    variavel mensagem = ""
+    variavel mensagens = []
+    
+    funcao render() {
+        variavel listaMensagens = ""
+        para (variavel i = 0; i menor this.mensagens.length; i = i mais 1) {
+            variavel msg = this.mensagens[i]
+            listaMensagens = listaMensagens + `
+                <div class="mensagem">
+                    <strong>${msg.usuario}:</strong> ${msg.texto}
+                    <small>${msg.timestamp}</small>
+                </div>
+            `
+        }
+        
+        retornar `
+            <div class="chat">
+                <h3>Chat em Tempo Real</h3>
+                <div class="mensagens" id="lista-mensagens">
+                    ${listaMensagens}
+                </div>
+                <div class="entrada">
+                    <input type="text" 
+                           placeholder="Digite sua mensagem..." 
+                           value="${this.mensagem}"
+                           onchange="this.atualizarMensagem(event.target.value)"
+                           onkeypress="this.enviarMensagem(event)">
+                    <button onclick="this.enviarMensagem()">Enviar</button>
+                </div>
+            </div>
+        `
+    }
+    
+    funcao atualizarMensagem(texto) {
+        this.mensagem = texto
+    }
+    
+    funcao enviarMensagem(evento = nulo) {
+        se (evento e evento.key diferente "Enter") {
+            retornar
+        }
+        
+        se (this.mensagem.trim() diferente "") {
+            variavel novaMensagem = {
+                usuario: store.usuario || "Anônimo",
+                texto: this.mensagem,
+                timestamp: new Date().toLocaleTimeString()
+            }
+            
+            this.mensagens.push(novaMensagem)
+            store.mensagens.push(novaMensagem)
+            
+            // Simular envio via WebSocket
+            this.simularWebSocket(novaMensagem)
+            
+            this.mensagem = ""
+            this.atualizar()
+        }
+    }
+    
+    funcao simularWebSocket(mensagem) {
+        // Simular recebimento de mensagem
+        aguardar(100).then(() => {
+            imprimir("Mensagem enviada: " + mensagem.texto)
+        })
+    }
+    
+    funcao atualizar() {
+        // Atualizar interface
+        imprimir("Chat atualizado com " + this.mensagens.length + " mensagens")
+    }
+}
+
+// Componente de formulário
+componente FormularioContato {
+    variavel nome = ""
+    variavel email = ""
+    variavel mensagem = ""
+    variavel enviado = falso
+    
+    funcao render() {
+        se (this.enviado) {
+            retornar `
+                <div class="formulario">
+                    <h3>Mensagem Enviada!</h3>
+                    <p>Obrigado pelo contato, ${this.nome}!</p>
+                    <button onclick="this.resetar()">Enviar Outra Mensagem</button>
+                </div>
+            `
+        }
+        
+        retornar `
+            <div class="formulario">
+                <h3>Entre em Contato</h3>
+                <form onsubmit="this.enviar(event)">
+                    <div>
+                        <label>Nome:</label>
+                        <input type="text" 
+                               value="${this.nome}"
+                               onchange="this.atualizarNome(event.target.value)"
+                               required>
+                    </div>
+                    <div>
+                        <label>Email:</label>
+                        <input type="email" 
+                               value="${this.email}"
+                               onchange="this.atualizarEmail(event.target.value)"
+                               required>
+                    </div>
+                    <div>
+                        <label>Mensagem:</label>
+                        <textarea onchange="this.atualizarMensagem(event.target.value)"
+                                  required>${this.mensagem}</textarea>
+                    </div>
+                    <button type="submit">Enviar</button>
+                </form>
+            </div>
+        `
+    }
+    
+    funcao atualizarNome(valor) {
+        this.nome = valor
+    }
+    
+    funcao atualizarEmail(valor) {
+        this.email = valor
+    }
+    
+    funcao atualizarMensagem(valor) {
+        this.mensagem = valor
+    }
+    
+    funcao enviar(evento) {
+        evento.preventDefault()
+        
+        // Validar dados
+        se (this.nome.trim() igual "" ou this.email.trim() igual "" ou this.mensagem.trim() igual "") {
+            imprimir("Por favor, preencha todos os campos")
+            retornar
+        }
+        
+        // Simular envio
+        imprimir("Enviando mensagem de " + this.nome + " (" + this.email + ")")
+        imprimir("Mensagem: " + this.mensagem)
+        
+        this.enviado = verdadeiro
+        this.atualizar()
+    }
+    
+    funcao resetar() {
+        this.nome = ""
+        this.email = ""
+        this.mensagem = ""
+        this.enviado = falso
+        this.atualizar()
+    }
+    
+    funcao atualizar() {
+        // Atualizar interface
+        imprimir("Formulário atualizado")
+    }
+}
+
+// Sistema de roteamento
+variavel rotas = {
+    "/": "Home",
+    "/sobre": "Sobre", 
+    "/contato": "Contato"
+}
+
+variavel rotaAtual = "/"
+
+// Função de navegação
+funcao navegar(rota) {
+    rotaAtual = rota
+    imprimir("Navegando para: " + rota)
+    renderizar()
+}
+
+// Função de renderização principal
+funcao renderizar() {
+    variavel conteudo = ""
+    
+    se (rotaAtual igual "/") {
+        conteudo = `
+            <div class="pagina">
+                <h2>Bem-vindo ao Stack Extensão!</h2>
+                <p>Esta é uma demonstração das funcionalidades web únicas da linguagem.</p>
+                <div id="contador-container"></div>
+                <div id="chat-container"></div>
+            </div>
+        `
+    } senao se (rotaAtual igual "/sobre") {
+        conteudo = `
+            <div class="pagina">
+                <h2>Sobre o Stack Extensão</h2>
+                <p>Stack Extensão é uma linguagem de programação super específica que combina:</p>
+                <ul>
+                    <li>Operadores matemáticos em português</li>
+                    <li>Funcionalidades web avançadas</li>
+                    <li>Sistema de módulos inteligente</li>
+                    <li>Componentes reativos</li>
+                    <li>Transpilação para JavaScript e Python</li>
+                </ul>
+            </div>
+        `
+    } senao se (rotaAtual igual "/contato") {
+        conteudo = `
+            <div class="pagina">
+                <h2>Contato</h2>
+                <div id="formulario-container"></div>
+            </div>
+        `
+    }
+    
+    variavel html = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Stack Extensão Web App</title>
+            <style>
+                body { font-family: Arial, sans-serif; margin: 0; padding: 20px; }
+                .cabecalho { background: #333; color: white; padding: 20px; margin-bottom: 20px; }
+                .cabecalho h1 { margin: 0; }
+                .cabecalho nav a { color: white; text-decoration: none; margin-right: 20px; }
+                .contador { border: 1px solid #ccc; padding: 20px; margin: 20px 0; }
+                .contador button { margin: 5px; padding: 10px; }
+                .chat { border: 1px solid #ccc; padding: 20px; margin: 20px 0; }
+                .mensagens { height: 200px; overflow-y: auto; border: 1px solid #eee; padding: 10px; }
+                .mensagem { margin: 5px 0; padding: 5px; background: #f9f9f9; }
+                .entrada { margin-top: 10px; }
+                .entrada input { width: 70%; padding: 5px; }
+                .entrada button { padding: 5px 10px; }
+                .formulario { border: 1px solid #ccc; padding: 20px; margin: 20px 0; }
+                .formulario div { margin: 10px 0; }
+                .formulario label { display: block; margin-bottom: 5px; }
+                .formulario input, .formulario textarea { width: 100%; padding: 5px; }
+                .formulario button { padding: 10px 20px; background: #007bff; color: white; border: none; }
+            </style>
+        </head>
+        <body>
+            <div id="app">
+                <div id="cabecalho"></div>
+                <div id="conteudo">${conteudo}</div>
+            </div>
+        </body>
+        </html>
+    `
+    
+    imprimir("=== Aplicação Web Renderizada ===")
+    imprimir("Rota atual: " + rotaAtual)
+    imprimir("HTML gerado com sucesso!")
+}
+
+// Função principal
+funcao main() {
+    imprimir("=== Stack Extensão Web App ===")
+    imprimir("Iniciando aplicação web...")
+    imprimir("")
+    
+    // Configurar store
+    store.usuario = "Usuário Stack"
+    store.conectado = verdadeiro
+    
+    // Renderizar aplicação
+    renderizar()
+    
+    // Simular interações
+    imprimir("\n=== Simulando Interações ===")
+    
+    // Simular navegação
+    navegar("/sobre")
+    aguardar(1000)
+    
+    navegar("/contato")
+    aguardar(1000)
+    
+    navegar("/")
+    
+    imprimir("\n=== Aplicação Web Iniciada ===")
+    imprimir("Use as funções de navegação para interagir com a aplicação")
+}
+
+// Executar aplicação
+main()
