@@ -10,11 +10,15 @@ const ModuleSystem = require('./modules/moduleSystem')
 const MathOperators = require('./math/operators')
 const WebComponents = require('./web/components')
 const BilingualSystem = require('./language/bilingual')
+const RealTimeTranslator = require('./language/realTimeTranslator')
 const MiniServer = require('./server/miniServer')
 const AdvancedWebFeatures = require('./web/advanced')
 const SmartTemplates = require('./templates/smartTemplates')
 const PluginSystem = require('./plugins/pluginSystem')
 const AIFeatures = require('./ai/aiFeatures')
+const WebEditor = require('./editor/webEditor')
+const ProjectSharing = require('./sharing/projectSharing')
+const RealTimeCollaboration = require('./collaboration/realTimeCollaboration')
 const fs = require('fs')
 const path = require('path')
 
@@ -27,11 +31,15 @@ class StackExtension {
     this.mathOperators = new MathOperators()
     this.webComponents = new WebComponents()
     this.bilingualSystem = new BilingualSystem()
+    this.realTimeTranslator = new RealTimeTranslator()
     this.miniServer = null
     this.advancedWeb = new AdvancedWebFeatures()
     this.smartTemplates = new SmartTemplates()
     this.pluginSystem = new PluginSystem()
     this.aiFeatures = new AIFeatures()
+    this.webEditor = null
+    this.projectSharing = null
+    this.realTimeCollaboration = null
     
     this.version = '1.0.0'
     this.runtime = {
@@ -229,6 +237,23 @@ class StackExtension {
     return this.bilingualSystem.suggestTranslations(code, targetLanguage)
   }
 
+  // Tradução em tempo real
+  translateRealTime(code, targetLanguage = 'portuguese') {
+    return this.realTimeTranslator.translateCode(code, targetLanguage)
+  }
+
+  translateWithSuggestions(code, targetLanguage = 'portuguese') {
+    return this.realTimeTranslator.translateWithSuggestions(code, targetLanguage)
+  }
+
+  toggleLanguage(code) {
+    return this.realTimeTranslator.toggleLanguage(code)
+  }
+
+  detectLanguage(code) {
+    return this.realTimeTranslator.detectLanguage(code)
+  }
+
   // Funcionalidades de IA
   async completeCode(code, context = {}) {
     return await this.aiFeatures.completeCode(code, context)
@@ -289,10 +314,71 @@ class StackExtension {
     return this.advancedWeb.createSmartCache(options)
   }
 
+  // Editor web
+  createWebEditor(options = {}) {
+    this.webEditor = new WebEditor(options)
+    return this.webEditor
+  }
+
+  // Compartilhamento de projetos
+  createProjectSharing(options = {}) {
+    this.projectSharing = new ProjectSharing(options)
+    return this.projectSharing
+  }
+
+  // Colaboração em tempo real
+  createRealTimeCollaboration(options = {}) {
+    this.realTimeCollaboration = new RealTimeCollaboration(options)
+    return this.realTimeCollaboration
+  }
+
+  // Iniciar editor web completo
+  async startWebEditor(options = {}) {
+    // Criar editor
+    this.webEditor = new WebEditor(options)
+    
+    // Criar compartilhamento
+    this.projectSharing = new ProjectSharing({
+      serverUrl: options.serverUrl || 'http://localhost:3000'
+    })
+    
+    // Criar colaboração
+    this.realTimeCollaboration = new RealTimeCollaboration({
+      serverUrl: options.serverUrl || 'ws://localhost:3000'
+    })
+    
+    // Iniciar servidor se necessário
+    if (options.startServer !== false) {
+      this.miniServer = new MiniServer({
+        port: options.port || 3000,
+        autoReload: true,
+        websocket: true,
+        api: true
+      })
+      
+      await this.miniServer.start()
+    }
+    
+    return {
+      editor: this.webEditor,
+      sharing: this.projectSharing,
+      collaboration: this.realTimeCollaboration,
+      server: this.miniServer
+    }
+  }
+
   // Parar servidor
   async stop() {
     if (this.miniServer) {
       await this.miniServer.stop()
+    }
+    
+    if (this.projectSharing) {
+      this.projectSharing.disconnect()
+    }
+    
+    if (this.realTimeCollaboration) {
+      this.realTimeCollaboration.disconnect()
     }
   }
 
