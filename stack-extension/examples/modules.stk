@@ -1,0 +1,209 @@
+// Exemplo de sistema de módulos em Stack Extensão
+// Demonstra importação, exportação e namespaces
+
+// Módulo de matemática
+exportar funcao somar(a, b) {
+    retornar a mais b
+}
+
+exportar funcao subtrair(a, b) {
+    retornar a menos b
+}
+
+exportar funcao multiplicar(a, b) {
+    retornar a vezes b
+}
+
+exportar funcao dividir(a, b) {
+    se (b igual 0) {
+        lançar "Divisão por zero não é permitida"
+    }
+    retornar a dividido b
+}
+
+exportar funcao potencia(base, expoente) {
+    retornar base elevado expoente
+}
+
+// Classe para operações matemáticas complexas
+exportar classe Calculadora {
+    variavel historico = []
+    
+    funcao calcular(operacao, a, b) {
+        variavel resultado = 0
+        
+        se (operacao igual "somar") {
+            resultado = somar(a, b)
+        } senao se (operacao igual "subtrair") {
+            resultado = subtrair(a, b)
+        } senao se (operacao igual "multiplicar") {
+            resultado = multiplicar(a, b)
+        } senao se (operacao igual "dividir") {
+            resultado = dividir(a, b)
+        } senao se (operacao igual "potencia") {
+            resultado = potencia(a, b)
+        } senao {
+            lançar "Operação não suportada: " + operacao
+        }
+        
+        // Adicionar ao histórico
+        this.historico.push({
+            operacao: operacao,
+            a: a,
+            b: b,
+            resultado: resultado
+        })
+        
+        retornar resultado
+    }
+    
+    funcao obterHistorico() {
+        retornar this.historico
+    }
+    
+    funcao limparHistorico() {
+        this.historico = []
+    }
+    
+    funcao obterUltimoResultado() {
+        se (this.historico.length maior 0) {
+            retornar this.historico[this.historico.length menos 1].resultado
+        }
+        retornar 0
+    }
+}
+
+// Módulo de utilitários
+exportar funcao formatarNumero(numero, casasDecimais = 2) {
+    retornar numero.toFixed(casasDecimais)
+}
+
+exportar funcao gerarId() {
+    retornar "id_" + Math.random().toString(36).substr(2, 9)
+}
+
+exportar funcao validarEmail(email) {
+    variavel regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    retornar regex.test(email)
+}
+
+// Classe para validação
+exportar classe Validador {
+    funcao validarCPF(cpf) {
+        // Implementação básica de validação de CPF
+        cpf = cpf.replace(/[^\d]/g, '')
+        
+        se (cpf.length diferente 11) {
+            retornar falso
+        }
+        
+        // Verificar se todos os dígitos são iguais
+        se (/^(\d)\1{10}$/.test(cpf)) {
+            retornar falso
+        }
+        
+        // Calcular primeiro dígito verificador
+        variavel soma = 0
+        para (variavel i = 0; i menor 9; i = i mais 1) {
+            soma = soma mais parseInt(cpf[i]) vezes (10 menos i)
+        }
+        variavel resto = soma modulo 11
+        variavel digito1 = resto menor 2 ? 0 : 11 menos resto
+        
+        // Calcular segundo dígito verificador
+        soma = 0
+        para (variavel i = 0; i menor 10; i = i mais 1) {
+            soma = soma mais parseInt(cpf[i]) vezes (11 menos i)
+        }
+        resto = soma modulo 11
+        variavel digito2 = resto menor 2 ? 0 : 11 menos resto
+        
+        retornar parseInt(cpf[9]) igual digito1 e parseInt(cpf[10]) igual digito2
+    }
+    
+    funcao validarCNPJ(cnpj) {
+        // Implementação básica de validação de CNPJ
+        cnpj = cnpj.replace(/[^\d]/g, '')
+        
+        se (cnpj.length diferente 14) {
+            retornar falso
+        }
+        
+        // Verificar se todos os dígitos são iguais
+        se (/^(\d)\1{13}$/.test(cnpj)) {
+            retornar falso
+        }
+        
+        // Calcular primeiro dígito verificador
+        variavel sequencia = [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2]
+        variavel soma = 0
+        para (variavel i = 0; i menor 12; i = i mais 1) {
+            soma = soma mais parseInt(cnpj[i]) vezes sequencia[i]
+        }
+        variavel resto = soma modulo 11
+        variavel digito1 = resto menor 2 ? 0 : 11 menos resto
+        
+        // Calcular segundo dígito verificador
+        sequencia = [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2]
+        soma = 0
+        para (variavel i = 0; i menor 13; i = i mais 1) {
+            soma = soma mais parseInt(cnpj[i]) vezes sequencia[i]
+        }
+        resto = soma modulo 11
+        variavel digito2 = resto menor 2 ? 0 : 11 menos resto
+        
+        retornar parseInt(cnpj[12]) igual digito1 e parseInt(cnpj[13]) igual digito2
+    }
+}
+
+// Função principal para demonstrar o uso dos módulos
+funcao main() {
+    imprimir("=== Sistema de Módulos - Stack Extensão ===")
+    imprimir("")
+    
+    // Usar funções exportadas
+    imprimir("Soma: 10 mais 5 = " + somar(10, 5))
+    imprimir("Subtração: 10 menos 3 = " + subtrair(10, 3))
+    imprimir("Multiplicação: 4 vezes 7 = " + multiplicar(4, 7))
+    imprimir("Divisão: 15 dividido 3 = " + dividir(15, 3))
+    imprimir("Potência: 2 elevado 8 = " + potencia(2, 8))
+    imprimir("")
+    
+    // Usar calculadora
+    variavel calc = novo Calculadora()
+    imprimir("=== Calculadora ===")
+    imprimir("10 + 5 = " + calc.calcular("somar", 10, 5))
+    imprimir("20 - 8 = " + calc.calcular("subtrair", 20, 8))
+    imprimir("6 * 7 = " + calc.calcular("multiplicar", 6, 7))
+    imprimir("100 / 4 = " + calc.calcular("dividir", 100, 4))
+    imprimir("3 ^ 4 = " + calc.calcular("potencia", 3, 4))
+    imprimir("")
+    
+    // Mostrar histórico
+    imprimir("=== Histórico da Calculadora ===")
+    variavel historico = calc.obterHistorico()
+    para (variavel i = 0; i menor historico.length; i = i mais 1) {
+        variavel op = historico[i]
+        imprimir(op.operacao + "(" + op.a + ", " + op.b + ") = " + op.resultado)
+    }
+    imprimir("")
+    
+    // Usar utilitários
+    imprimir("=== Utilitários ===")
+    imprimir("Número formatado: " + formatarNumero(3.14159, 3))
+    imprimir("ID gerado: " + gerarId())
+    imprimir("Email válido: " + validarEmail("teste@exemplo.com"))
+    imprimir("")
+    
+    // Usar validador
+    variavel validador = novo Validador()
+    imprimir("=== Validador ===")
+    imprimir("CPF válido: " + validador.validarCPF("123.456.789-09"))
+    imprimir("CNPJ válido: " + validador.validarCNPJ("12.345.678/0001-90"))
+    imprimir("")
+    
+    imprimir("=== Fim da Demonstração ===")
+}
+
+// Executar função principal
+main()

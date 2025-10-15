@@ -1,0 +1,25 @@
+{
+  "name": "stack-extension",
+  "version": "1.0.0",
+  "description": "Stack Extensão - Uma linguagem de programação super específica baseada em JavaScript e Python",
+  "main": "src/index.js",
+  "bin": {
+    "stk": "./bin/stk"
+  },
+  "scripts": {
+    "build": "node src/build.js",
+    "test": "node src/test.js",
+    "dev": "node src/dev.js"
+  },
+  "keywords": ["programming-language", "javascript", "python", "stack", "extension"],
+  "author": "Stack Extensão Team",
+  "license": "MIT",
+  "dependencies": {
+    "acorn": "^8.8.0",
+    "acorn-walk": "^8.2.0",
+    "commander": "^9.4.0"
+  },
+  "devDependencies": {
+    "jest": "^29.0.0"
+  }
+}

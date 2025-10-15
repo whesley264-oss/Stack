@@ -1,0 +1,18 @@
+#!/usr/bin/env node
+
+/**
+ * CLI para Stack Extensão
+ */
+
+const StackExtension = require('../src/index')
+
+// Verificar se chokidar está disponível
+let chokidar
+try {
+  chokidar = require('chokidar')
+} catch (error) {
+  console.warn('chokidar não encontrado. Instale com: npm install chokidar')
+}
+
+// Executar CLI
+require('../src/index')
