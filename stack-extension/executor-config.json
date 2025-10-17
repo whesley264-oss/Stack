@@ -1,0 +1,39 @@
+{
+  "version": "1.0.0",
+  "name": "Stack Extensão Executor",
+  "description": "Executor visual em Python para Stack Extensão",
+  "settings": {
+    "default_port": 3000,
+    "timeout": 30,
+    "auto_open_browser": true,
+    "theme": "default",
+    "language": "pt"
+  },
+  "features": {
+    "file_execution": true,
+    "web_server": true,
+    "compilation": true,
+    "ai_analysis": true,
+    "translation": true,
+    "examples": true,
+    "settings": true,
+    "help": true
+  },
+  "paths": {
+    "examples": "examples/",
+    "output": "output/",
+    "logs": "logs/"
+  },
+  "colors": {
+    "primary": "#667eea",
+    "success": "#28a745",
+    "warning": "#ffc107",
+    "error": "#dc3545",
+    "info": "#17a2b8"
+  },
+  "commands": {
+    "stk": "stk",
+    "npx": "npx stack-extension",
+    "node": "node"
+  }
+}
