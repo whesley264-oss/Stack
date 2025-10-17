@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TiwiterClone - O que está acontecendo?</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="app">
+        <!-- Loading Screen -->
+        <div id="loading-screen" class="loading-screen">
+            <div class="loading-content">
+                <div class="logo">
+                    <i class="fab fa-twitter"></i>
+                </div>
+                <div class="loading-text">TiwiterClone</div>
+                <div class="loading-spinner"></div>
+            </div>
+        </div>
+
+        <!-- Login/Register Modal -->
+        <div id="auth-modal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button class="close-btn" onclick="closeAuthModal()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="auth-tabs">
+                        <button class="tab-btn active" onclick="switchAuthTab('login')">Entrar</button>
+                        <button class="tab-btn" onclick="switchAuthTab('register')">Registrar</button>
+                    </div>
+                    
+                    <!-- Login Form -->
+                    <div id="login-form" class="auth-form active">
+                        <h2>Entrar no TiwiterClone</h2>
+                        <form onsubmit="handleLogin(event)">
+                            <div class="form-group">
+                                <input type="email" id="login-email" placeholder="Email" required>
+                            </div>
+                            <div class="form-group">
+                                <input type="password" id="login-password" placeholder="Senha" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Entrar</button>
+                        </form>
+                    </div>
+                    
+                    <!-- Register Form -->
+                    <div id="register-form" class="auth-form">
+                        <h2>Criar conta no TiwiterClone</h2>
+                        <form onsubmit="handleRegister(event)">
+                            <div class="form-group">
+                                <input type="text" id="register-username" placeholder="Username" required>
+                            </div>
+                            <div class="form-group">
+                                <input type="text" id="register-display-name" placeholder="Nome de exibição" required>
+                            </div>
+                            <div class="form-group">
+                                <input type="email" id="register-email" placeholder="Email" required>
+                            </div>
+                            <div class="form-group">
+                                <input type="password" id="register-password" placeholder="Senha" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Registrar</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Layout -->
+        <div id="main-layout" class="main-layout" style="display: none;">
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <div class="sidebar-content">
+                    <div class="logo">
+                        <i class="fab fa-twitter"></i>
+                    </div>
+                    
+                    <nav class="nav-menu">
+                        <a href="#" class="nav-item active" onclick="showSection('home')">
+                            <i class="fas fa-home"></i>
+                            <span>Início</span>
+                        </a>
+                        <a href="#" class="nav-item" onclick="showSection('explore')">
+                            <i class="fas fa-hashtag"></i>
+                            <span>Explorar</span>
+                        </a>
+                        <a href="#" class="nav-item" onclick="showSection('notifications')">
+                            <i class="fas fa-bell"></i>
+                            <span>Notificações</span>
+                        </a>
+                        <a href="#" class="nav-item" onclick="showSection('messages')">
+                            <i class="fas fa-envelope"></i>
+                            <span>Mensagens</span>
+                        </a>
+                        <a href="#" class="nav-item" onclick="showSection('bookmarks')">
+                            <i class="fas fa-bookmark"></i>
+                            <span>Itens salvos</span>
+                        </a>
+                        <a href="#" class="nav-item" onclick="showSection('profile')">
+                            <i class="fas fa-user"></i>
+                            <span>Perfil</span>
+                        </a>
+                    </nav>
+                    
+                    <button class="btn btn-primary tweet-btn" onclick="openTweetModal()">
+                        <i class="fas fa-feather-alt"></i>
+                        <span>Tweetar</span>
+                    </button>
+                    
+                    <div class="user-menu">
+                        <div class="user-info" onclick="toggleUserMenu()">
+                            <img id="user-avatar" src="https://via.placeholder.com/40/1DA1F2/FFFFFF?text=U" alt="Avatar">
+                            <div class="user-details">
+                                <div id="user-name">Usuário</div>
+                                <div id="user-username">@username</div>
+                            </div>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div id="user-dropdown" class="user-dropdown">
+                            <a href="#" onclick="showSection('profile')">
+                                <i class="fas fa-user"></i>
+                                Perfil
+                            </a>
+                            <a href="#" onclick="showSection('settings')">
+                                <i class="fas fa-cog"></i>
+                                Configurações
+                            </a>
+                            <a href="#" onclick="logout()">
+                                <i class="fas fa-sign-out-alt"></i>
+                                Sair
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="main-content">
+                <!-- Home Section -->
+                <div id="home-section" class="section active">
+                    <div class="section-header">
+                        <h1>Início</h1>
+                        <button class="btn btn-icon" onclick="refreshFeed()">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                    </div>
+                    
+                    <!-- Tweet Composer -->
+                    <div class="tweet-composer">
+                        <img id="composer-avatar" src="https://via.placeholder.com/40/1DA1F2/FFFFFF?text=U" alt="Avatar">
+                        <div class="composer-content">
+                            <textarea id="tweet-text" placeholder="O que está acontecendo?" maxlength="280"></textarea>
+                            <div class="composer-actions">
+                                <div class="composer-tools">
+                                    <button class="btn btn-icon" onclick="addImage()">
+                                        <i class="fas fa-image"></i>
+                                    </button>
+                                    <button class="btn btn-icon" onclick="addGif()">
+                                        <i class="fab fa-giphy"></i>
+                                    </button>
+                                    <button class="btn btn-icon" onclick="addPoll()">
+                                        <i class="fas fa-poll"></i>
+                                    </button>
+                                    <button class="btn btn-icon" onclick="addEmoji()">
+                                        <i class="far fa-smile"></i>
+                                    </button>
+                                </div>
+                                <div class="composer-submit">
+                                    <span id="char-count">0/280</span>
+                                    <button class="btn btn-primary" onclick="postTweet()" disabled>
+                                        Tweetar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Feed -->
+                    <div id="tweet-feed" class="tweet-feed">
+                        <!-- Tweets will be loaded here -->
+                    </div>
+                    
+                    <div id="loading-more" class="loading-more" style="display: none;">
+                        <div class="spinner"></div>
+                        <span>Carregando mais tweets...</span>
+                    </div>
+                </div>
+
+                <!-- Explore Section -->
+                <div id="explore-section" class="section">
+                    <div class="section-header">
+                        <h1>Explorar</h1>
+                    </div>
+                    <div class="search-container">
+                        <div class="search-box">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="search-input" placeholder="Buscar no TiwiterClone">
+                        </div>
+                    </div>
+                    <div id="search-results" class="search-results">
+                        <!-- Search results will be loaded here -->
+                    </div>
+                </div>
+
+                <!-- Notifications Section -->
+                <div id="notifications-section" class="section">
+                    <div class="section-header">
+                        <h1>Notificações</h1>
+                    </div>
+                    <div id="notifications-list" class="notifications-list">
+                        <!-- Notifications will be loaded here -->
+                    </div>
+                </div>
+
+                <!-- Messages Section -->
+                <div id="messages-section" class="section">
+                    <div class="section-header">
+                        <h1>Mensagens</h1>
+                    </div>
+                    <div id="messages-list" class="messages-list">
+                        <!-- Messages will be loaded here -->
+                    </div>
+                </div>
+
+                <!-- Bookmarks Section -->
+                <div id="bookmarks-section" class="section">
+                    <div class="section-header">
+                        <h1>Itens salvos</h1>
+                    </div>
+                    <div id="bookmarks-list" class="bookmarks-list">
+                        <!-- Bookmarks will be loaded here -->
+                    </div>
+                </div>
+
+                <!-- Profile Section -->
+                <div id="profile-section" class="section">
+                    <div class="section-header">
+                        <h1>Perfil</h1>
+                    </div>
+                    <div id="profile-content" class="profile-content">
+                        <!-- Profile content will be loaded here -->
+                    </div>
+                </div>
+            </main>
+
+            <!-- Right Sidebar -->
+            <aside class="right-sidebar">
+                <div class="right-sidebar-content">
+                    <!-- Search Widget -->
+                    <div class="widget search-widget">
+                        <div class="search-box">
+                            <i class="fas fa-search"></i>
+                            <input type="text" placeholder="Buscar no TiwiterClone">
+                        </div>
+                    </div>
+                    
+                    <!-- Trends Widget -->
+                    <div class="widget trends-widget">
+                        <h3>O que está acontecendo</h3>
+                        <div id="trends-list" class="trends-list">
+                            <!-- Trends will be loaded here -->
+                        </div>
+                    </div>
+                    
+                    <!-- Who to Follow Widget -->
+                    <div class="widget who-to-follow">
+                        <h3>Quem seguir</h3>
+                        <div id="suggestions-list" class="suggestions-list">
+                            <!-- Suggestions will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+            </aside>
+        </div>
+
+        <!-- Tweet Modal -->
+        <div id="tweet-modal" class="modal">
+            <div class="modal-content tweet-modal-content">
+                <div class="modal-header">
+                    <button class="close-btn" onclick="closeTweetModal()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="tweet-composer">
+                        <img id="modal-composer-avatar" src="https://via.placeholder.com/40/1DA1F2/FFFFFF?text=U" alt="Avatar">
+                        <div class="composer-content">
+                            <textarea id="modal-tweet-text" placeholder="O que está acontecendo?" maxlength="280"></textarea>
+                            <div class="composer-actions">
+                                <div class="composer-tools">
+                                    <button class="btn btn-icon" onclick="addImage()">
+                                        <i class="fas fa-image"></i>
+                                    </button>
+                                    <button class="btn btn-icon" onclick="addGif()">
+                                        <i class="fab fa-giphy"></i>
+                                    </button>
+                                    <button class="btn btn-icon" onclick="addPoll()">
+                                        <i class="fas fa-poll"></i>
+                                    </button>
+                                    <button class="btn btn-icon" onclick="addEmoji()">
+                                        <i class="far fa-smile"></i>
+                                    </button>
+                                </div>
+                                <div class="composer-submit">
+                                    <span id="modal-char-count">0/280</span>
+                                    <button class="btn btn-primary" onclick="postTweet()" disabled>
+                                        Tweetar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/tweets.js"></script>
+    <script src="js/ui.js"></script>
+</body>
+</html>
